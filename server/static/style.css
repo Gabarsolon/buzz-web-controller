@@ -110,11 +110,14 @@ h1 {
 }
 
 .row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
-  height: 42vh;
+  height: 52vh;
+}
+
+.row .buzzer {
+  flex: 1;
 }
 
 .row .blue   { background: var(--blue);   box-shadow: 0 6px 0 #0e3f85; }
