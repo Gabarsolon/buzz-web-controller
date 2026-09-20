@@ -60,11 +60,17 @@ For players **not** on your network, add `--public`:
 python -m server.app --public
 ```
 
-This opens an [ngrok](https://ngrok.com) tunnel (via `pyngrok`, which fetches
-the `ngrok` binary automatically -- no separate install) and prints an
-`https://...ngrok...` URL alongside the LAN one. Internet players will have
-extra latency (typically tens to a couple hundred ms) versus LAN, which
-matters for a reflex-buzzer game -- worth trying before an actual game night.
+This opens a [Cloudflare quick tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/)
+(via `pycloudflared`, which fetches the `cloudflared` binary automatically --
+no separate install, no account, no signup) and prints an
+`https://...trycloudflare.com` URL alongside the LAN one. It was chosen over
+ngrok specifically because it needs no account at all and WebSocket support
+is confirmed working end-to-end through it. Internet players will have extra
+latency (typically tens to a couple hundred ms) versus LAN, which matters for
+a reflex-buzzer game -- worth trying before an actual game night. Quick
+tunnels are meant for exactly this: temporary use, not something to leave
+running unattended for weeks (each run gets a fresh random URL; there's no
+SLA on uptime).
 
 Use `--players N` (1-4) to limit how many slots exist, and `--port` to change
 the port.

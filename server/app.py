@@ -161,28 +161,34 @@ def main():
     ap.add_argument('--port', type=int, default=8420)
     ap.add_argument('--players', type=int, default=4, choices=range(1, 5))
     ap.add_argument('--public', action='store_true',
-                    help='Also open an ngrok tunnel so players can join over the internet.')
+                    help='Also open a Cloudflare quick tunnel so players can join over the internet.')
     args = ap.parse_args()
 
     logging.basicConfig(level=logging.INFO, format='%(message)s')
     app = build_app(args.players)
 
     public_url = None
+    tunnel_process = None
     if args.public:
-        from pyngrok import ngrok
-        tunnel = ngrok.connect(args.port, 'http')
-        public_url = tunnel.public_url.replace('http://', 'https://')
+        from pycloudflared import try_cloudflare
+        urls = try_cloudflare(port=args.port, verbose=False)
+        public_url = urls.tunnel
+        tunnel_process = urls.process
 
     ip = lan_ip()
     log.info('Buzz Web Controller -- %d player slot(s)', args.players)
     log.info('  LAN:  http://%s:%d', ip, args.port)
     if public_url:
-        log.info('  WAN:  %s  (ngrok tunnel; latency will be higher than LAN)', public_url)
+        log.info('  WAN:  %s  (Cloudflare quick tunnel; latency will be higher than LAN)', public_url)
     else:
         log.info('  (run with --public to also allow players over the internet)')
     log.info('Open PCSX2 > Settings > Controllers > USB and bind BuzzDevice to these pads once players join.')
 
-    web.run_app(app, host='0.0.0.0', port=args.port, print=None)
+    try:
+        web.run_app(app, host='0.0.0.0', port=args.port, print=None)
+    finally:
+        if tunnel_process is not None:
+            tunnel_process.terminate()
 
 
 if __name__ == '__main__':
