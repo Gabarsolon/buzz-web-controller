@@ -65,6 +65,30 @@ class Hub:
 routes = web.RouteTableDef()
 
 
+@routes.post('/admin/tap/{slot}')
+async def admin_tap(request):
+    """Press-and-release red on a pad directly, bypassing the slot-claim
+    system entirely. For tools/bind_pcsx2.py: identifying which SDL index a
+    slot's virtual pad landed on must work even while a phone already holds
+    that slot, and this doesn't touch hub.holders or affect that phone's
+    session. Loopback-only -- this must never be reachable from the LAN/WAN,
+    since it lets anyone who can reach it press any player's button."""
+    if request.remote not in ('127.0.0.1', '::1'):
+        return web.Response(status=403, text='admin endpoint is loopback-only')
+    hub: Hub = request.app['hub']
+    try:
+        slot = int(request.match_info['slot'])
+    except ValueError:
+        return web.Response(status=400)
+    pad = hub.pads.get(slot)
+    if pad is None:
+        return web.Response(status=404, text=f'no such slot: {slot}')
+    pad.press('red')
+    await asyncio.sleep(0.15)
+    pad.release('red')
+    return web.Response(status=204)
+
+
 @routes.get('/')
 async def index(request):
     return web.FileResponse(STATIC_DIR / 'index.html')
