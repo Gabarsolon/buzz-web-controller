@@ -1,3 +1,6 @@
+> **This project moved to [Gabarsolon/buzz-bridge](https://github.com/Gabarsolon/buzz-bridge/tree/main/pcsx2) (`pcsx2/` folder), with its full history.**
+> This repository is archived and no longer updated. Buzz! Bridge also has phones and DualShocks as buzzers for PS3 Buzz! games.
+
 # Buzz Web Controller
 
 Use phones as Buzz! buzzers for PCSX2, over LAN or over the internet, no
